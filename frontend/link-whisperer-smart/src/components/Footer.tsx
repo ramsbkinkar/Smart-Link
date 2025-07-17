@@ -99,14 +99,15 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">
-            © 2024 SmartLink. All rights reserved.
-          </p>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <p>© 2024 SmartLink. All rights reserved.</p>
+          <div className="flex items-center gap-1">
             <span>Made with</span>
             <Heart className="h-4 w-4 text-red-500 fill-current" />
-            <span>for the web</span>
+            <span>by</span>
+            <a href="https://github.com/ramsbkinkar" target="_blank" rel="noopener noreferrer" className="font-medium hover:underline">
+              Ram Kinkar
+            </a>
           </div>
         </div>
       </div>
