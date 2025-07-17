@@ -60,6 +60,11 @@ resource "aws_lambda_function" "shorten_url" {
   handler       = "shorten.lambda_handler"
   runtime       = "python3.9"
   role          = aws_iam_role.lambda_exec.arn
+  environment {
+    variables = {
+      API_HOST = aws_apigatewayv2_api.api.api_endpoint
+    }
+  }
 }
 
 # API Gateway

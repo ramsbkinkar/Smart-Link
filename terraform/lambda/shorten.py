@@ -2,6 +2,7 @@ import json
 import boto3
 import time
 import logging
+import os
 from utils import generate_short_code, hash_password
 from models import create_shortlink_item
 
@@ -19,6 +20,8 @@ CORS_HEADERS = {
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Allow-Methods": "OPTIONS,POST"
 }
+
+API_HOST = os.environ["API_HOST"]
 
 def lambda_handler(event, context):
     logger.info("Received event: %s", json.dumps(event))
@@ -63,7 +66,7 @@ def lambda_handler(event, context):
             'statusCode': 200,
             'headers': CORS_HEADERS,
             'body': json.dumps({
-                'short_url': f"https://bhjrt72dfk.execute-api.us-east-1.amazonaws.com/{short_code}",
+                'short_url': f"https://{API_HOST}/{short_code}",
                 'original_url': original_url,
                 'password_protected': bool(password)
             })
