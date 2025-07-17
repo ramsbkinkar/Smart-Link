@@ -1,0 +1,64 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ----- Build React frontend -----
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+      - name: Install deps & build
+        run: |
+          cd frontend/link-whisperer-smart
+          bun install --frozen-lockfile
+          bun run build
+
+      # ----- Configure AWS credentials via OIDC -----
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # ----- Terraform apply (provisions backend + S3/CloudFront) -----
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init -input=false
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -input=false -auto-approve
+
+      # ----- Retrieve Terraform outputs -----
+      - name: Get Terraform outputs
+        id: tf_outputs
+        working-directory: terraform
+        run: |
+          echo "bucket=$(terraform output -raw frontend_bucket_name)" >> $GITHUB_OUTPUT
+          echo "dist=$(terraform output -raw frontend_distribution_id)" >> $GITHUB_OUTPUT
+
+      # ----- Sync build to S3 -----
+      - name: Upload frontend to S3
+        run: |
+          aws s3 sync frontend/link-whisperer-smart/dist "s3://${{ steps.tf_outputs.outputs.bucket }}" --delete
+
+      # ----- Invalidate CloudFront cache -----
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ steps.tf_outputs.outputs.dist }} --paths '/*' 
