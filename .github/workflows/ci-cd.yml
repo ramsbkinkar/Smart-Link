@@ -42,13 +42,8 @@ jobs:
 
       # --- Upload new build ---
       - name: Upload frontend to S3
-        run: |
-          aws s3 sync frontend/link-whisperer-smart/dist \
-            s3://smartlink-frontend-7cfccuub --delete      # <-- your bucket
+        run: aws s3 sync frontend/link-whisperer-smart/dist s3://smartlink-frontend-7cfccuub --delete
 
       # --- Invalidate cache ---
       - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id E1WOP0B98DP0VW \            # <-- your distribution
-            --paths '/*' 
+        run: aws cloudfront create-invalidation --distribution-id E1WOP0B98DP0VW --paths '/*' 
