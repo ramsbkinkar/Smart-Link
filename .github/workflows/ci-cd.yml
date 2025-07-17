@@ -34,16 +34,11 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       # ----- Terraform apply (provisions backend + S3/CloudFront) -----
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
-      - name: Terraform Init
-        working-directory: terraform
-        run: terraform init -input=false
-      - name: Terraform Apply
-        working-directory: terraform
-        run: terraform apply -input=false -auto-approve
+      # The backend infrastructure is already provisioned via a one-time
+      # `terraform apply` run by the maintainer.  CI now focuses on
+      # building the React frontend, syncing it to S3, and invalidating
+      # CloudFront.  Re-enable these steps if you move state to a remote
+      # backend.
 
       # ----- Retrieve Terraform outputs -----
       - name: Get Terraform outputs
