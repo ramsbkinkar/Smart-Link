@@ -40,20 +40,15 @@ jobs:
       # CloudFront.  Re-enable these steps if you move state to a remote
       # backend.
 
-      # ----- Retrieve Terraform outputs -----
-      - name: Get Terraform outputs
-        id: tf_outputs
-        working-directory: terraform
-        run: |
-          echo "bucket=$(terraform output -raw frontend_bucket_name)" >> $GITHUB_OUTPUT
-          echo "dist=$(terraform output -raw frontend_distribution_id)" >> $GITHUB_OUTPUT
-
-      # ----- Sync build to S3 -----
+      # --- Upload new build ---
       - name: Upload frontend to S3
         run: |
-          aws s3 sync frontend/link-whisperer-smart/dist "s3://${{ steps.tf_outputs.outputs.bucket }}" --delete
+          aws s3 sync frontend/link-whisperer-smart/dist \
+            s3://smartlink-frontend-7cfccuub --delete      # <-- your bucket
 
-      # ----- Invalidate CloudFront cache -----
+      # --- Invalidate cache ---
       - name: Invalidate CloudFront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ steps.tf_outputs.outputs.dist }} --paths '/*' 
+          aws cloudfront create-invalidation \
+            --distribution-id E1WOP0B98DP0VW \            # <-- your distribution
+            --paths '/*' 
