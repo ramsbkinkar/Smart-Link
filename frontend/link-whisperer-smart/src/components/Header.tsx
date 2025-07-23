@@ -16,15 +16,15 @@ export const Header = () => {
         </RouterLink>
         
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Features
-          </a>
-          <a href="#analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          <RouterLink to="/#analytics" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             Analytics
-          </a>
-          <a href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+          </RouterLink>
+          <RouterLink to="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
             About
-          </a>
+          </RouterLink>
+          <RouterLink to="/api" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            API Docs
+          </RouterLink>
         </nav>
       </div>
     </header>
